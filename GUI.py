@@ -1,22 +1,40 @@
-import tkinter as TK
+from tkinter import *
+import os
+
+tk = None
 
 
 def main():
-    tk = init_tkinter()  # initial window
-    init_ui(tk)  # initial ui(button, text...)
-    # tk.mainloop()  # open the window
+    init_tkinter()  # initial window
+    init_ui()  # initial ui(button, text...)
+    tk.mainloop()  # open the window
 
 
 def init_tkinter():
-    tk = TK.Tk()
+    global tk
+    tk = Tk()
     tk.title("OS window")
     tk.state("zoomed")
-    return tk
+    tk.protocol("WM_DELETE_WINDOW", quit_program)
+    # return tk
 
 
-def init_ui(tk):
-    label = TK.Label(tk, text="Hello World!")
-    label.pack()
+def init_ui():
+    GUIDemo(master=tk)
+
+
+class GUIDemo(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.grid()
+        self.createWidgets()
+
+    def createWidgets(self):
+        pass
+
+
+def quit_program():
+    os._exit(1)
 
 
 # ----- functions for thread -----
