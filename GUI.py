@@ -1,4 +1,5 @@
 from tkinter import *
+from PIL import ImageTk, Image
 import os
 
 tk = None
@@ -16,7 +17,6 @@ def init_tkinter():
     tk.title("OS window")
     tk.state("zoomed")
     tk.protocol("WM_DELETE_WINDOW", quit_program)
-    # return tk
 
 
 def init_ui():
@@ -26,10 +26,16 @@ def init_ui():
 class GUIDemo(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
-        self.grid()
+        self.pack(fill=BOTH, expand=1)
+        # self.grid()
         self.createWidgets()
 
     def createWidgets(self):
+        _image = ImageTk.PhotoImage(Image.open("src/elevator.png"))
+        ui_elevator = Label(self, image=_image)
+        ui_elevator.place(x=200, y=20)
+        # ui_elevator.grid()
+        ui_elevator.image = _image
         pass
 
 
