@@ -4,7 +4,7 @@ import time
 pygame.init()
 
 SIZE = WIDTH, HEIGHT = 720, 480
-BACKGROUND_COLOR = pygame.Color('black')
+BACKGROUND_COLOR = pygame.Color('white')
 FPS = 5
 
 screen = pygame.display.set_mode(SIZE)
@@ -138,6 +138,10 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             else:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_a:
+                        create_person()
+                        all_sprites = pygame.sprite.Group(playerX)
                 for i in range(0,len(playerX)):
                     playerX[i].velocity.x = 5
     
