@@ -16,7 +16,7 @@ def main():
         floor_lock.append(_lock)
 
     RandomAccessFloor().start()  # start random access floors
-    threading.Thread(target=random_create_people(100))  # start creating people
+    RandomCreatePeople(100).start()  # start creating people
 
 
 class Person(threading.Thread):  # inherit thread
@@ -77,17 +77,24 @@ class Person(threading.Thread):  # inherit thread
         # todo: some elevator function there
 
 
-def random_create_people(prob):
-    i = 0  # no. of the person
-    while True:
-        p = random.randrange(0, 100)  # should change a way later
-        if p < prob:
-            name = "person-"+str(i)
-            at = random.randrange(0, FLOOR)  # random assign a floor
-            to = random.randrange(0, FLOOR)  # random assign a floor
-            Person(name, at, floor_lock[at], to, floor_lock[to]).start()
-            i += 1
-        time.sleep(2)
+class RandomCreatePeople(threading.Thread):
+    prob = 0
+
+    def __init__(self, prob):
+        self.prob = prob
+        super(RandomCreatePeople, self).__init__()
+
+    def run(self):
+        i = 0  # no. of the person
+        while True:
+            p = random.randrange(0, 100)  # should change a way later
+            if p < self.prob:
+                name = "person-" + str(i)
+                at = random.randrange(0, FLOOR)  # random assign a floor
+                to = random.randrange(0, FLOOR)  # random assign a floor
+                Person(name, at, floor_lock[at], to, floor_lock[to]).start()
+                i += 1
+            time.sleep(2)
 
 
 class RandomAccessFloor(threading.Thread):
