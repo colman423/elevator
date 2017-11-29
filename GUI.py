@@ -9,6 +9,7 @@ FPS = 30
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 playerX = []
+ElevatorImages = []
 stopPosition = 200
 elevatorPosition = stopPosition + 30
 def load_images():
@@ -85,9 +86,9 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.current_frame = 0
 
     def update_time_dependent(self, dt):
-        space_ship = pygame.image.load("elevator.png").convert_alpha()
-
-        space_ship_rect = space_ship.get_rect()
+#        space_ship = pygame.image.load("elevator.png").convert_alpha()
+#
+#        space_ship_rect = space_ship.get_rect()
         """
         Updates the image of Sprite approximately every 0.3 second.
 
@@ -104,8 +105,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             self.current_time = 0
             self.index = (self.index + 1) % len(self.images)
             self.image = self.images[self.index]
-#        if self.rect.center[0] > 200:
-#            self.velocity.x = 0
+
         self.rect.move_ip(*self.velocity)
 
 #    def update_frame_dependent(self):
@@ -133,6 +133,9 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 
 def main():
+    
+    ElevatorImages.append(pygame.image.load("elevator.png"))
+    Elevator = AnimatedSprite(position=(300, 100), images=ElevatorImages)
     create_person()
 #    timer = 0.0
     count = 0
@@ -149,6 +152,13 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
                         create_person()
+                    if event.key == pygame.K_UP:
+                        Elevator.velocity.y = -3
+                    if event.key == pygame.K_DOWN:
+                        Elevator.velocity.y = 3
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        Elevator.velocity.y = 0
         if count < len(playerX):
             if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
@@ -163,9 +173,12 @@ def main():
 #                    count += 1
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
         all_sprites.update(dt)  # Calls the 'update' method on all sprites in the list (currently just the player).
+        elevator_sprites = pygame.sprite.Group(Elevator)
+        elevator_sprites.update(dt)
         
         screen.fill(BACKGROUND_COLOR)
         all_sprites.draw(screen)
+        elevator_sprites.draw(screen)
         pygame.display.update()
 
 
