@@ -9,7 +9,8 @@ FPS = 30
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 playerX = []
-
+stopPosition = 200
+elevatorPosition = stopPosition + 30
 def load_images():
     """
     Loads all images in directory. The directory must only contain images.
@@ -42,12 +43,14 @@ def create_person():  # create a person ui
 
 
 def person_entering(person):  # let waiting person walk into elevator
-    # todo
+    person.velocity.x = 1
+    if person.rect.center[0] > elevatorPosition:
+        person.velocity.x = 0
     return True
 
 
 def person_leaving(person):  # let arrived person leave the window
-    # todo
+    person.velocity.x = -1
     return True
 
 
@@ -133,7 +136,7 @@ def main():
     create_person()
 #    timer = 0.0
     count = 0
-    stopDistance = 200
+    
     running = True
     while running:
         
@@ -147,7 +150,7 @@ def main():
                     if event.key == pygame.K_a:
                         create_person()
         if count < len(playerX):
-            if playerX[count].rect.center[0] > stopDistance:
+            if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
                 count += 1
             
