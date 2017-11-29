@@ -3,7 +3,7 @@ import pygame
 import time
 pygame.init()
 
-SIZE = WIDTH, HEIGHT = 720, 480
+SIZE = WIDTH, HEIGHT = 720, 720
 BACKGROUND_COLOR = pygame.Color('white')
 FPS = 30
 screen = pygame.display.set_mode(SIZE)
@@ -11,7 +11,8 @@ clock = pygame.time.Clock()
 playerX = []
 ElevatorImages = []
 stopPosition = 200
-elevatorPosition = stopPosition + 30
+elevatorPosition = stopPosition + 130
+maxFloor = 5
 def load_images():
     """
     Loads all images in directory. The directory must only contain images.
@@ -33,11 +34,23 @@ def quit_program():
 
 
 # ----- functions for thread -----
+def elevatorMoveTo(elevator,floor):
+    if elevator.rect.center[1]-50 > maxFloor*100-floor*100:
+        elevator.velocity.y = -4
+        if elevator.rect.center[1] <= maxFloor*100-floor*100:
+            elevator.velocity.y = 0
+    elif elevator.rect.center[1]-50 < maxFloor*100-floor*100:
+        elevator.velocity.y = 4
+        if elevator.rect.center[1] >= maxFloor*100-floor*100:
+            elevator.velocity.y = 0
+    else:
+        elevator.velocity.y = 0
+    return 0
 
 def create_person():  # create a person ui
     
     images = load_images()  # Make sure to provide the relative or full path to the images directory.
-    player = AnimatedSprite(position=(100, 100+(len(playerX))%4*100), images=images)
+    player = AnimatedSprite(position=(100, 100+(len(playerX))%6*100), images=images)
     playerX.append(player)
     player.velocity.x = 1
     return 0
@@ -47,8 +60,8 @@ def person_entering(person):  # let waiting person walk into elevator
     person.velocity.x = 1
     if person.rect.center[0] > elevatorPosition:
         person.velocity.x = 0
-    return True
-
+        return True
+    return False
 
 def person_leaving(person):  # let arrived person leave the window
     person.velocity.x = -1
@@ -67,7 +80,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
         """
         super(AnimatedSprite, self).__init__()
 
-        size = (32, 32)  # This should match the size of the images.
+        size = (16, 16)  # This should match the size of the images.
         posirionX = position[0]
         positionY = position[1]
         self.rect = pygame.Rect(position, size)
@@ -135,7 +148,12 @@ class AnimatedSprite(pygame.sprite.Sprite):
 def main():
     
     ElevatorImages.append(pygame.image.load("elevator.png"))
-    Elevator = AnimatedSprite(position=(300, 100), images=ElevatorImages)
+    Elevator = AnimatedSprite(position=(300, 550), images=ElevatorImages)
+    create_person()
+    create_person()
+    create_person()
+    create_person()
+    create_person()
     create_person()
 #    timer = 0.0
     count = 0
@@ -152,19 +170,19 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
                         create_person()
-                    if event.key == pygame.K_UP:
-                        Elevator.velocity.y = -3
-                    if event.key == pygame.K_DOWN:
-                        Elevator.velocity.y = 3
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                        Elevator.velocity.y = 0
+#                    if event.key == pygame.K_UP:
+#                        Elevator.velocity.y = -3
+#                    if event.key == pygame.K_DOWN:
+#                        Elevator.velocity.y = 3
+#                if event.type == pygame.KEYUP:
+#                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+#                        Elevator.velocity.y = 0
         if count < len(playerX):
             if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
                 count += 1
-            
-                            
+#        elevatorMoveTo(Elevator,5)
+#        person_entering(playerX[0])
 #            timer += dt*5
 #            if timer >= 3:
 #                timer = 0
