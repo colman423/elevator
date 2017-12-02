@@ -195,9 +195,9 @@ def main():
             if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
                 count += 1
-    
+        elevatorMoveTo(Elevator,10)
         if len(peopleInElevator) == 0:
-            elevatorMoveTo(Elevator,10)
+            
             if person_entering(playerX[0]):
                 peopleInElevator.append(playerX[0])
         if playerX[0].InTheElevator and Elevator.currentFloor == 10:
