@@ -15,7 +15,6 @@ elevatorPosition = stopPosition + 70
 maxFloor = 10
 eachFloorSize = 70
 peopleInElevator = []
-#elevatorStop = False
 def load_images():
     """
     Loads all images in directory. The directory must only contain images.
@@ -40,18 +39,14 @@ def quit_program():
 def elevatorMoveTo(elevator,floor):
     if elevator.rect.center[1]-5 > maxFloor*eachFloorSize-floor*eachFloorSize:
         elevator.velocity.y = -4
-#        elevatorStop = False
         if elevator.rect.center[1] <= maxFloor*eachFloorSize-floor*eachFloorSize:
             elevator.currentFloor = floor
             elevator.velocity.y = 0
-#            elevatorStop = True
     elif elevator.rect.center[1]-5 < maxFloor*eachFloorSize-floor*eachFloorSize:
         elevator.velocity.y = 4
-#        elevatorStop = False
         if elevator.rect.center[1] >= maxFloor*eachFloorSize-floor*eachFloorSize:
             elevator.currentFloor = floor
             elevator.velocity.y = 0
-#            elevatorStop = True
     else:
         elevator.velocity.y = 0
     return 0
@@ -114,9 +109,6 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.current_frame = 0
 
     def update_time_dependent(self, dt):
-#        space_ship = pygame.image.load("elevator.png").convert_alpha()
-#
-#        space_ship_rect = space_ship.get_rect()
         """
         Updates the image of Sprite approximately every 0.3 second.
 
@@ -169,7 +161,6 @@ def main():
     create_person()
     create_person()
     create_person()
-#    timer = 0.0
     count = 0
     
     running = True
@@ -195,6 +186,7 @@ def main():
             if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
                 count += 1
+        #for test
         elevatorMoveTo(Elevator,10)
         if len(peopleInElevator) == 0:
             
@@ -205,7 +197,7 @@ def main():
             peopleInElevator[0].velocity.y = Elevator.velocity.y
         if Elevator.currentFloor == 1:
             person_leaving(playerX[0])
-
+        ######################
 
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
         all_sprites.update(dt)  # Calls the 'update' method on all sprites in the list (currently just the player).
