@@ -10,9 +10,12 @@ screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 playerX = []
 ElevatorImages = []
-stopPosition = 200
-elevatorPosition = stopPosition + 130
-maxFloor = 5
+stopPosition = 450
+elevatorPosition = stopPosition + 70
+maxFloor = 10
+eachFloorSize = 70
+peopleInElevator = []
+#elevatorStop = False
 def load_images():
     """
     Loads all images in directory. The directory must only contain images.
@@ -35,14 +38,20 @@ def quit_program():
 
 # ----- functions for thread -----
 def elevatorMoveTo(elevator,floor):
-    if elevator.rect.center[1]-50 > maxFloor*100-floor*100:
+    if elevator.rect.center[1]-5 > maxFloor*eachFloorSize-floor*eachFloorSize:
         elevator.velocity.y = -4
-        if elevator.rect.center[1] <= maxFloor*100-floor*100:
+#        elevatorStop = False
+        if elevator.rect.center[1] <= maxFloor*eachFloorSize-floor*eachFloorSize:
+            elevator.currentFloor = floor
             elevator.velocity.y = 0
-    elif elevator.rect.center[1]-50 < maxFloor*100-floor*100:
+#            elevatorStop = True
+    elif elevator.rect.center[1]-5 < maxFloor*eachFloorSize-floor*eachFloorSize:
         elevator.velocity.y = 4
-        if elevator.rect.center[1] >= maxFloor*100-floor*100:
+#        elevatorStop = False
+        if elevator.rect.center[1] >= maxFloor*eachFloorSize-floor*eachFloorSize:
+            elevator.currentFloor = floor
             elevator.velocity.y = 0
+#            elevatorStop = True
     else:
         elevator.velocity.y = 0
     return 0
@@ -50,21 +59,25 @@ def elevatorMoveTo(elevator,floor):
 def create_person():  # create a person ui
     
     images = load_images()  # Make sure to provide the relative or full path to the images directory.
-    player = AnimatedSprite(position=(100, 100+(len(playerX))%6*100), images=images)
+    player = AnimatedSprite(position=(100, 10+(len(playerX))%maxFloor*eachFloorSize), images=images)
     playerX.append(player)
     player.velocity.x = 1
     return 0
 
 
 def person_entering(person):  # let waiting person walk into elevator
+    
     person.velocity.x = 1
     if person.rect.center[0] > elevatorPosition:
         person.velocity.x = 0
+        person.InTheElevator = True
         return True
     return False
 
 def person_leaving(person):  # let arrived person leave the window
     person.velocity.x = -1
+    person.velocity.y = 0
+    person.InTheElevator = False
     return True
 
 
@@ -79,7 +92,9 @@ class AnimatedSprite(pygame.sprite.Sprite):
             images: Images to use in the animation.
         """
         super(AnimatedSprite, self).__init__()
-
+        self.isMoving = True
+        self.currentFloor = 0
+        self.InTheElevator = False
         size = (16, 16)  # This should match the size of the images.
         posirionX = position[0]
         positionY = position[1]
@@ -146,9 +161,8 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 
 def main():
-    
     ElevatorImages.append(pygame.image.load("elevator.png"))
-    Elevator = AnimatedSprite(position=(300, 550), images=ElevatorImages)
+    Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages)
     create_person()
     create_person()
     create_person()
@@ -181,14 +195,18 @@ def main():
             if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
                 count += 1
-#        elevatorMoveTo(Elevator,5)
-#        person_entering(playerX[0])
-#            timer += dt*5
-#            if timer >= 3:
-#                timer = 0
-#                playerX[count].velocity.x = 0
-#                if count <= len(playerX):
-#                    count += 1
+    
+        if len(peopleInElevator) == 0:
+            elevatorMoveTo(Elevator,10)
+            if person_entering(playerX[0]):
+                peopleInElevator.append(playerX[0])
+        if playerX[0].InTheElevator and Elevator.currentFloor == 10:
+            elevatorMoveTo(Elevator,1)
+            peopleInElevator[0].velocity.y = Elevator.velocity.y
+        if Elevator.currentFloor == 1:
+            person_leaving(playerX[0])
+
+
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
         all_sprites.update(dt)  # Calls the 'update' method on all sprites in the list (currently just the player).
         elevator_sprites = pygame.sprite.Group(Elevator)
