@@ -15,6 +15,7 @@ elevatorPosition = stopPosition + 70
 maxFloor = 10
 eachFloorSize = 70
 peopleInElevator = []
+NumberOfPersonOnFloor = [0 for x in range(maxFloor+1)]
 def load_images():
     """
     Loads all images in directory. The directory must only contain images.
@@ -53,9 +54,11 @@ def elevatorMoveTo(elevator,floor):
 
 def create_person(floor):  # create a person ui
     
+    NumberOfPersonOnFloor[floor] += 1 #count the number of person in each floor
     images = load_images()  # Make sure to provide the relative or full path to the images directory.
     player = AnimatedSprite(position=(100, HEIGHT-(10+floor*eachFloorSize)), images=images, floor = floor)
     
+    #add font on person's head
     player.font = pygame.font.SysFont("Arial", 12)
     player.textsurf = player.font.render("test", 1, pygame.Color('red'))
     player.images[0].blit(player.textsurf, [10, -3])
@@ -72,6 +75,7 @@ def person_entering(person):  # let waiting person walk into elevator
     if person.rect.center[0] > elevatorPosition:
         person.velocity.x = 0
         person.InTheElevator = True
+        NumberOfPersonOnFloor[person.floor] -= 1
         return True
     return False
 
@@ -168,8 +172,10 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 
 def main():
+    #create elevator
     ElevatorImages.append(pygame.image.load("elevator.png"))
     Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 0)
+    #for test
     create_person(10)
     create_person(9)
     create_person(8)
@@ -187,9 +193,12 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             else:
+                #for test
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
-                        create_person()
+                        create_person(10)
+                    if event.key == pygame.K_z:
+                        create_person(9)
 #                    if event.key == pygame.K_UP:
 #                        Elevator.velocity.y = -3
 #                    if event.key == pygame.K_DOWN:
@@ -197,8 +206,9 @@ def main():
 #                if event.type == pygame.KEYUP:
 #                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
 #                        Elevator.velocity.y = 0
+        #calculate the person stop point
         if count < len(playerX):
-            if playerX[count].rect.center[0] > stopPosition:
+            if playerX[count].rect.center[0] > stopPosition - NumberOfPersonOnFloor[playerX[count].floor]*20:
                 playerX[count].velocity.x = 0
                 count += 1
         #for test
@@ -212,7 +222,8 @@ def main():
         if Elevator.currentFloor == 1:
             person_leaving(playerX[0])
         ######################
-
+        
+        #draw all sprites
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
         all_sprites.update(dt)  # Calls the 'update' method on all sprites in the list (currently just the player).
         elevator_sprites = pygame.sprite.Group(Elevator)
