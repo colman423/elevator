@@ -51,10 +51,16 @@ def elevatorMoveTo(elevator,floor):
         elevator.velocity.y = 0
     return 0
 
-def create_person():  # create a person ui
+def create_person(floor):  # create a person ui
     
     images = load_images()  # Make sure to provide the relative or full path to the images directory.
-    player = AnimatedSprite(position=(100, 10+(len(playerX))%maxFloor*eachFloorSize), images=images)
+    player = AnimatedSprite(position=(100, HEIGHT-(10+floor*eachFloorSize)), images=images, floor = floor)
+    
+    player.font = pygame.font.SysFont("Arial", 12)
+    player.textsurf = player.font.render("test", 1, pygame.Color('red'))
+    player.images[0].blit(player.textsurf, [10, -3])
+    player.images[1].blit(player.textsurf, [10, -3])
+    
     playerX.append(player)
     player.velocity.x = 1
     return 0
@@ -78,7 +84,7 @@ def person_leaving(person):  # let arrived person leave the window
 
 class AnimatedSprite(pygame.sprite.Sprite):
     
-    def __init__(self, position, images):
+    def __init__(self, position, images, floor):
         """
         Animated sprite object.
 
@@ -87,6 +93,11 @@ class AnimatedSprite(pygame.sprite.Sprite):
             images: Images to use in the animation.
         """
         super(AnimatedSprite, self).__init__()
+        
+
+
+        
+        self.floor = floor
         self.isMoving = True
         self.currentFloor = 0
         self.InTheElevator = False
@@ -107,6 +118,10 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
         self.animation_frames = 6
         self.current_frame = 0
+    
+    
+
+
 
     def update_time_dependent(self, dt):
         """
@@ -154,13 +169,13 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 def main():
     ElevatorImages.append(pygame.image.load("elevator.png"))
-    Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages)
-    create_person()
-    create_person()
-    create_person()
-    create_person()
-    create_person()
-    create_person()
+    Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 0)
+    create_person(10)
+    create_person(9)
+    create_person(8)
+    create_person(7)
+    create_person(6)
+    create_person(1)
     count = 0
     
     running = True
@@ -189,7 +204,6 @@ def main():
         #for test
         elevatorMoveTo(Elevator,10)
         if len(peopleInElevator) == 0:
-            
             if person_entering(playerX[0]):
                 peopleInElevator.append(playerX[0])
         if playerX[0].InTheElevator and Elevator.currentFloor == 10:
