@@ -38,11 +38,10 @@ class Elevator(threading.Thread):
         if self.active == False:
             print("ACTIVE")
             self.active = True
-            print(self.waiting_list.items())
-            print(sorted(self.waiting_list.items(), key= lambda t: len(t)))
-            print(list(OrderedDict(sorted(self.waiting_list.items(), key= lambda t: len(t)))))
-            most_waiting_floor = OrderedDict(sorted(self.waiting_list.items(), key= lambda t: len(t)))
-            floor = list(OrderedDict(sorted(self.waiting_list.items(), key= lambda t: len(t)))).pop()
+            # print(self.waiting_list.items())
+            # print(sorted(self.waiting_list.items(), key= lambda t: len(t[1])))
+            # print(sorted(self.waiting_list.items(), key= lambda t: len(t[1])).pop()[0])
+            floor = sorted(self.waiting_list.items(), key= lambda t: len(t[1])).pop()[0]
             atFloor, toFloor = self.waiting_list[floor].pop()
             self.waiting_num -= 1
             self.take_passenger(atFloor)
@@ -50,7 +49,7 @@ class Elevator(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(3)
+            time.sleep(0.1)
             if len(self.toPass) == 0 and self.waiting_num != 0:
                 self.get_passenger_from_waiting()
 
@@ -60,7 +59,8 @@ if __name__ == "__main__":
     elevator =  Elevator()
     elevator.start()
     import random
-    for i in range(2):
+    # for i in range(10):
+    while True:
         atFloor, toFloor = random.randrange(0, 10), random.randrange(0, 10)
         print()
         print('passenger:', atFloor, toFloor)
