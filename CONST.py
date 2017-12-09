@@ -1,0 +1,2 @@
+MAX_FLOOR = 10
+FLOOR = 10
