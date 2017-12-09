@@ -3,8 +3,8 @@ import time
 import random
 import STATE
 import GUI
+from CONST import *
 
-FLOOR = 10
 # floor_lock = [threading.Lock()] * FLOOR   # not useful, this will point all element to same lock
 floor_lock = list()  # create a list of thread lock for every floor
 
@@ -33,7 +33,7 @@ class Person(threading.Thread):  # inherit thread
         self.init_to = init_to  # floor where he want to arrive
         self.init_at_lock = init_at_lock  # get the lock at the floor where he call elevator
         self.init_to_lock = init_to_lock  # get the lock at the floor where he want to arrive
-        self.GUI_person = GUI.create_person()  # get the person ui
+        self.GUI_person = GUI.create_person(init_at)  # get the person ui
 
     def start(self):
         self.call_elevator()  # call the elevator
@@ -64,7 +64,8 @@ class Person(threading.Thread):  # inherit thread
                 print("{0} is leaving elevator".format(self.name))
                 leave_complete = GUI.person_leaving(self.GUI_person)  # maybe some GUI represent here
                 if leave_complete:
-                    del self  # will this line work??
+                    return
+                    # del self  # will this line work??
 
             else:
                 print("{0} has bug QQ".format(self.name))
