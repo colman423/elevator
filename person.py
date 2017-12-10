@@ -46,13 +46,13 @@ class Person(threading.Thread):  # inherit thread
                 print("{0} is waiting elevator at floor {1}".format(self.name, self.init_at))
                 self.init_at_lock.acquire()  # waiting the elevator to release that floor's lock
                 self.state = STATE.ENTERING  # after lock released, switch state into entering elevator
-                self.init_at_lock.release()  # release lock resource to other people
 
             elif self.state == STATE.ENTERING:  # if this person is walking enter elevator
                 print("{0} is entering elevator".format(self.name))
                 enter_completed = GUI.person_entering(self.GUI_person)  # maybe some GUI represent here
                 if enter_completed:
                     self.state = STATE.TRANSPORTING
+                    self.init_at_lock.release()  # release lock resource to other people
 
             elif self.state == STATE.TRANSPORTING:  # if this person is taking elevator
                 print("{0} is taking elevator to floor {1}".format(self.name, self.init_to))
