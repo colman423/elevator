@@ -66,7 +66,10 @@ class Elevator(threading.Thread):
         
     def transport(self):
         self.fromFloor = self.toFloor
-        self.toFloor = self.toTransport[-1] #  need to implement a exiting prioirtiy to choose which floor the elevator should go to
+        floor = sorted(self.toTransport, key= lambda t: self.toTransport.count(t)).pop()
+        self.toFloor = floor 
+        # need to implement a exiting prioirtiy to choose which floor the elevator should go to
+        # now we take the floor the most people are going to
         time.sleep(0.1)
         print("Elevator move from {} to {}...".format(self.fromFloor, self.toFloor))
 
@@ -126,4 +129,4 @@ if __name__ == "__main__":
         print('passenger:', atFloor, toFloor)
         newPassenger = threading.Thread(target=elevator.set_new_passenger, args=(atFloor, toFloor, ))
         newPassenger.start()
-        time.sleep(0.01)
+        time.sleep(0.001)
