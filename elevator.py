@@ -14,28 +14,32 @@ class Elevator(threading.Thread):
         self.toFloor = 0
 
     def take_passenger(self, atFloor):
-        time.sleep(0.1)
         self.toFloor = atFloor
+        time.sleep(0.1) # moving time
+        print("Elevator move from {} to {}".format(self.fromFloor, self.toFloor))
+
         self.passenger_num += len(self.waiting_list[atFloor])
         self.waiting_num -= len(self.waiting_list[atFloor])
-        print("Elevator move from {} to {}".format(self.fromFloor, self.toFloor))
         print("{} people enter elevator".format(len(self.waiting_list[atFloor])))   
-        print("{} people in the elevator".format(self.passenger_num))
+
         self.toTransport += self.waiting_list[atFloor]
         self.waiting_list[atFloor] = []
+        print("{} people in the elevator".format(self.passenger_num))
         print('toTransport: ', self.toTransport)
         
     def transport(self):
-        time.sleep(0.1)
         self.fromFloor = self.toFloor
         self.toFloor = self.toTransport.pop() #  need to implement a exiting prioirtiy to choose which floor the elevator should go to
+        time.sleep(0.1)
+        print("Elevator move from {} to {}".format(self.fromFloor, self.toFloor))
+        
         leave_num = len([desitnation for desitnation in self.toTransport if desitnation == self.toFloor]) + 1 # the pop one
         self.passenger_num -= leave_num # reduce the same desitnation people num
-        print("Elevator move from {} to {} ({} peoples will be still in elevator)".format(self.fromFloor, self.toFloor, self.passenger_num))
         self.toTransport = [desitnation for desitnation in self.toTransport if desitnation != self.toFloor]
         print("{} people exits".format(leave_num))
         print('toTransport: ', self.toTransport)
         self.fromFloor = self.toFloor
+
         if self.waiting_list[self.fromFloor] != []:
             self.waiting_num -= len(self.waiting_list[self.fromFloor])
             self.passenger_num += len(self.waiting_list[self.fromFloor])
@@ -58,9 +62,6 @@ class Elevator(threading.Thread):
         if self.active == False:
             print("ACTIVE")
             self.active = True
-            # print(self.waiting_list.items())
-            # print(sorted(self.waiting_list.items(), key= lambda t: len(t[1])))
-            # print(sorted(self.waiting_list.items(), key= lambda t: len(t[1])).pop()[0])
             floor = sorted(self.waiting_list.items(), key= lambda t: len(t[1])).pop()[0]
             # need to implement a waiting prioirtiy to choose which floor the elevator should go to
             # now we take the floor the most people waiting
