@@ -1,6 +1,6 @@
 import threading
 import time
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 class Elevator(threading.Thread):
     def __init__(self):
@@ -18,8 +18,9 @@ class Elevator(threading.Thread):
         self.toFloor = atFloor
         self.passenger_num += len(self.waiting_list[atFloor])
         self.waiting_num -= len(self.waiting_list[atFloor])
-        print("Elevator move from {} to {} ({} peoples in elevator)".format(self.fromFloor, self.toFloor, self.passenger_num))
+        print("Elevator move from {} to {}".format(self.fromFloor, self.toFloor))
         print("{} people enter elevator".format(len(self.waiting_list[atFloor])))   
+        print("{} people in the elevator".format(self.passenger_num))
         self.toTransport += self.waiting_list[atFloor]
         self.waiting_list[atFloor] = []
         print('toTransport: ', self.toTransport)
@@ -28,9 +29,12 @@ class Elevator(threading.Thread):
         time.sleep(0.1)
         self.fromFloor = self.toFloor
         self.toFloor = self.toTransport.pop() #  need to implement a exiting prioirtiy to choose which floor the elevator should go to
-        self.passenger_num -= 1 # reduce the same desitnation people num
-        print("Elevator move from {} to {} ({} peoples in elevator)".format(self.fromFloor, self.toFloor, self.passenger_num))
-        print("{} people exits".format('xxx'))
+        leave_num = len([desitnation for desitnation in self.toTransport if desitnation == self.toFloor]) + 1 # the pop one
+        self.passenger_num -= leave_num # reduce the same desitnation people num
+        print("Elevator move from {} to {} ({} peoples will be still in elevator)".format(self.fromFloor, self.toFloor, self.passenger_num))
+        self.toTransport = [desitnation for desitnation in self.toTransport if desitnation != self.toFloor]
+        print("{} people exits".format(leave_num))
+        print('toTransport: ', self.toTransport)
         self.fromFloor = self.toFloor
         if self.waiting_list[self.fromFloor] != []:
             self.waiting_num -= len(self.waiting_list[self.fromFloor])
@@ -75,7 +79,6 @@ if __name__ == "__main__":
     elevator =  Elevator()
     elevator.start()
     import random
-    # for i in range(10):
     while True:
         atFloor, toFloor = random.randrange(0, 10), random.randrange(0, 10)
         print()
