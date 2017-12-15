@@ -101,10 +101,14 @@ eachFloorSize = 70
 peopleInElevator = []
 NumberOfPersonOnFloor = [0 for x in range(maxFloor+1)]
 elevatorVelocity = 30
+elevatorFloor = 0
 
 #create elevator
 ElevatorImages.append(pygame.image.load("elevator.png"))
-Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 0)
+Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 1)
+Elevator.font = pygame.font.SysFont("Arial", 12)
+Elevator.textsurf = Elevator.font.render(str(elevatorFloor), 1, pygame.Color('red'))
+Elevator.images[0].blit(Elevator.textsurf, [10, -3])
 
 def load_images():
     """
@@ -127,17 +131,20 @@ def quit_program():
 
 # ----- functions for thread -----
 def elevatorMoveTo(floor):
+    elevatorFloor = floor
     if Elevator.rect.center[1]-15 > maxFloor*eachFloorSize-floor*eachFloorSize:
         Elevator.velocity.y = -elevatorVelocity
         if Elevator.rect.center[1] <= maxFloor*eachFloorSize-floor*eachFloorSize:
             Elevator.currentFloor = floor
             Elevator.velocity.y = 0
+            print(Elevator.rect.center[1])
             return True
     elif Elevator.rect.center[1]-15 < maxFloor*eachFloorSize-floor*eachFloorSize:
         Elevator.velocity.y = elevatorVelocity
         if Elevator.rect.center[1] >= maxFloor*eachFloorSize-floor*eachFloorSize:
             Elevator.currentFloor = floor
             Elevator.velocity.y = 0
+            print(Elevator.rect.center[1])
             return True
     else:
         Elevator.velocity.y = 0
@@ -189,13 +196,12 @@ def floorToScreenHeight(floor):
 
 def main():
     
-    #for test
-    create_person(10)
-    create_person(9)
-    create_person(8)
-    create_person(7)
-    create_person(6)
-    create_person(1)
+#    #for test
+#    create_person(9)
+#    create_person(8)
+#    create_person(7)
+#    create_person(6)
+#    create_person(1)
     count = 0
     
     running = True
@@ -223,22 +229,22 @@ def main():
 #                        Elevator.velocity.y = 0
         #calculate the person stop point
         if count < len(playerX):
-            if playerX[count].rect.center[0] > stopPosition - NumberOfPersonOnFloor[playerX[count].floor]*20:
+            if playerX[count].rect.center[0] > stopPosition:
                 playerX[count].velocity.x = 0
                 playerX[count].state = STATE.WAITING
                 count += 1
-        #for test
-        elevatorMoveTo(10)
-        if len(peopleInElevator) == 0:
-            if person_entering(playerX[0]):
-                peopleInElevator.append(playerX[0])
-        if playerX[0].InTheElevator and Elevator.currentFloor == 10:
-            elevatorMoveTo(1)
-            peopleInElevator[0].velocity.y = Elevator.velocity.y
-        if Elevator.currentFloor == 1:
-            person_leaving(playerX[0])
-        ######################
-        
+#        #for test
+#        elevatorMoveTo(10)
+#        if len(peopleInElevator) == 0:
+#            if person_entering(playerX[0]):
+#                peopleInElevator.append(playerX[0])
+#        if playerX[0].InTheElevator and Elevator.currentFloor == 10:
+#            elevatorMoveTo(1)
+#            peopleInElevator[0].velocity.y = Elevator.velocity.y
+#        if Elevator.currentFloor == 1:
+#            person_leaving(playerX[0])
+#        ######################
+
         #draw all sprites
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
         all_sprites.update(dt)  # Calls the 'update' method on all sprites in the list (currently just the player).

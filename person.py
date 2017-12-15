@@ -106,7 +106,7 @@ class RandomCreatePeople(threading.Thread):
                 # to = random.randrange(0, FLOOR)  # random assign a floor 
                 Person(name, at, floor_lock[at], to, floor_lock[to]).start()
                 i += 1
-            time.sleep(0.01)
+            time.sleep(1)
 
 
 class RandomAccessFloor(threading.Thread):
