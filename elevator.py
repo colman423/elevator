@@ -12,10 +12,14 @@ class Elevator(threading.Thread):
         self.active = False
         self.fromFloor = 0
         self.toFloor = 0
+        self.lock = threading.Lock()
+        self.lock.acquire()
 
     def transport_passenger_when_moving(self):
         if self.fromFloor > self.toFloor:
             for i in range(self.fromFloor, self.toFloor, -1):
+                self.lock.release()
+                self.lock.acquire()                
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
                     self.toTransport += self.waiting_list[i]
@@ -32,6 +36,8 @@ class Elevator(threading.Thread):
                     print('In elevator(to transport): ', self.toTransport)
         elif self.fromFloor < self.toFloor:
             for i in range(self.fromFloor, self.toFloor):
+                self.lock.release()
+                self.lock.acquire()     
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
                     self.toTransport += self.waiting_list[i]
@@ -53,7 +59,8 @@ class Elevator(threading.Thread):
         print("Elevator move from {} to {}...".format(self.fromFloor, self.toFloor))
 
         self.transport_passenger_when_moving()
-
+        self.lock.release()
+        self.lock.acquire()     
         print('Elevator arrive at {}'.format(self.toFloor))
         self.passenger_num += len(self.waiting_list[atFloor])
         self.waiting_num -= len(self.waiting_list[atFloor])
@@ -74,7 +81,8 @@ class Elevator(threading.Thread):
         print("Elevator move from {} to {}...".format(self.fromFloor, self.toFloor))
 
         self.transport_passenger_when_moving()
-        
+        self.lock.release()
+        self.lock.acquire()            
         print('Elevator arrive at {}'.format(self.toFloor))
         leave_num = len([desitnation for desitnation in self.toTransport if desitnation == self.toFloor])
         self.passenger_num -= leave_num # reduce the same desitnation people num
