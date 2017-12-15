@@ -1,6 +1,7 @@
 import os
 import pygame
 import time
+import STATE
 pygame.init()
 
 SIZE = WIDTH, HEIGHT = 720, 720
@@ -16,6 +17,7 @@ maxFloor = 10
 eachFloorSize = 70
 peopleInElevator = []
 NumberOfPersonOnFloor = [0 for x in range(maxFloor+1)]
+elevatorVelocity = 30
 def load_images():
     """
     Loads all images in directory. The directory must only contain images.
@@ -38,19 +40,21 @@ def quit_program():
 
 # ----- functions for thread -----
 def elevatorMoveTo(elevator,floor):
-    if elevator.rect.center[1]-5 > maxFloor*eachFloorSize-floor*eachFloorSize:
-        elevator.velocity.y = -4
+    if elevator.rect.center[1]-15 > maxFloor*eachFloorSize-floor*eachFloorSize:
+        elevator.velocity.y = -elevatorVelocity
         if elevator.rect.center[1] <= maxFloor*eachFloorSize-floor*eachFloorSize:
             elevator.currentFloor = floor
             elevator.velocity.y = 0
-    elif elevator.rect.center[1]-5 < maxFloor*eachFloorSize-floor*eachFloorSize:
-        elevator.velocity.y = 4
+            return True
+    elif elevator.rect.center[1]-15 < maxFloor*eachFloorSize-floor*eachFloorSize:
+        elevator.velocity.y = elevatorVelocity
         if elevator.rect.center[1] >= maxFloor*eachFloorSize-floor*eachFloorSize:
             elevator.currentFloor = floor
             elevator.velocity.y = 0
+            return True
     else:
         elevator.velocity.y = 0
-    return 0
+    return False
 
 def create_person(floor):  # create a person ui
     
@@ -70,16 +74,17 @@ def create_person(floor):  # create a person ui
 
 
 def person_entering(person):  # let waiting person walk into elevator
-    
     person.velocity.x = 1
     if person.rect.center[0] > elevatorPosition:
         person.velocity.x = 0
         person.InTheElevator = True
+        person.state = STATE.TRANSPORTING
         NumberOfPersonOnFloor[person.floor] -= 1
         return True
     return False
 
 def person_leaving(person):  # let arrived person leave the window
+    person.state = STATE.LEAVING
     person.velocity.x = -1
     person.velocity.y = 0
     person.InTheElevator = False
@@ -100,7 +105,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
         
 
 
-        
+        self.state = STATE.CREATION
         self.floor = floor
         self.isMoving = True
         self.currentFloor = 0
@@ -175,6 +180,7 @@ def main():
     #create elevator
     ElevatorImages.append(pygame.image.load("elevator.png"))
     Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 0)
+    
     #for test
     create_person(10)
     create_person(9)
@@ -210,6 +216,7 @@ def main():
         if count < len(playerX):
             if playerX[count].rect.center[0] > stopPosition - NumberOfPersonOnFloor[playerX[count].floor]*20:
                 playerX[count].velocity.x = 0
+                playerX[count].state = STATE.WAITING
                 count += 1
         #for test
         elevatorMoveTo(Elevator,10)
