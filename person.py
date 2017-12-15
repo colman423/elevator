@@ -4,16 +4,24 @@ import random
 import STATE
 import GUI
 from CONST import *
+from elevator import Elevator
 
 # floor_lock = [threading.Lock()] * FLOOR   # not useful, this will point all element to same lock
 floor_lock = list()  # create a list of thread lock for every floor
 
-
+global elevator
 def main():
+
     for i in range(0, FLOOR):  # initial locks at every floor
         _lock = threading.Lock()
         _lock.acquire()
         floor_lock.append(_lock)
+
+
+    global elevator
+    elevator = Elevator()
+    # elevator = Elevator(floor_lock)
+    elevator.start()
 
     RandomAccessFloor().start()  # start random access floors
     RandomCreatePeople(100).start()  # start creating people
@@ -75,6 +83,7 @@ class Person(threading.Thread):  # inherit thread
     def call_elevator(self):  # not complete
         print("{0} call_elevator, from {1} to {2}".format(self.name, self.init_at, self.init_to))
         self.state = STATE.WAITING  # called elevator, now's state is waiting elevator
+        elevator.set_new_passenger(self.init_at, self.init_to)
         # todo: some elevator function there
 
 
