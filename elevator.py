@@ -20,8 +20,10 @@ class Elevator(threading.Thread):
         if self.fromFloor > self.toFloor:
             for i in range(self.fromFloor, self.toFloor, -1):
                 self.lock.release()
-                self.lock.acquire()
                 elevatorMoveTo(self.fromFloor+1)
+                self.lock.acquire()
+                
+
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
                     self.toTransport += self.waiting_list[i]
@@ -39,7 +41,9 @@ class Elevator(threading.Thread):
         elif self.fromFloor < self.toFloor:
             for i in range(self.fromFloor, self.toFloor):
                 self.lock.release()
-                self.lock.acquire()     
+                
+                self.lock.acquire()
+                
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
                     self.toTransport += self.waiting_list[i]
@@ -80,8 +84,9 @@ class Elevator(threading.Thread):
         # need to implement a exiting prioirtiy to choose which floor the elevator should go to
         # now we take the floor the most people are going to
         time.sleep(0.1)
+        
         print("Elevator move from {} to {}...".format(self.fromFloor, self.toFloor))
-
+        
         self.transport_passenger_when_moving()
         self.lock.release()
         self.lock.acquire()            

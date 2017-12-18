@@ -40,9 +40,6 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.current_frame = 0
     
     
-    
-    
-    
     def update_time_dependent(self, dt):
         """
             Updates the image of Sprite approximately every 0.3 second.
@@ -63,26 +60,8 @@ class AnimatedSprite(pygame.sprite.Sprite):
         
         self.rect.move_ip(*self.velocity)
     
-    #    def update_frame_dependent(self):
-    #        """
-    #        Updates the image of Sprite every 6 frame (approximately every 0.1 second if frame rate is 60).
-    #        """
-    #        if self.velocity.x > 0:  # Use the right images if sprite is moving right.
-    #            self.images = self.images_right
-    #        elif self.velocity.x < 0:
-    #            self.images = self.images_left
-    #
-    #        self.current_frame += 1
-    #        if self.current_frame >= self.animation_frames:
-    #            self.current_frame = 0
-    #            self.index = (self.index + 1) % len(self.images)
-    #            self.image = self.images[self.index]
-    #
-    #        self.rect.move_ip(*self.velocity)
-    
     def update(self, dt):
         """This is the method that's being called when 'all_sprites.update(dt)' is called."""
-        # Switch between the two update methods by commenting/uncommenting.
         self.update_time_dependent(dt)
 
 pygame.init()
@@ -107,8 +86,8 @@ elevatorFloor = 0
 ElevatorImages.append(pygame.image.load("elevator.png"))
 Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 1)
 Elevator.font = pygame.font.SysFont("Arial", 12)
-Elevator.textsurf = Elevator.font.render(str(elevatorFloor), 1, pygame.Color('red'))
-Elevator.images[0].blit(Elevator.textsurf, [10, -3])
+
+
 
 def load_images():
     """
@@ -130,21 +109,27 @@ def quit_program():
     os._exit(1)
 
 # ----- functions for thread -----
+def elevatorStop():
+    Elevator.velocity.y = 0
+    return 0
 def elevatorMoveTo(floor):
+    if Elevator.rect.center[1]-15 > 720 or Elevator.rect.center[1]-15 < 0:
+        Elevator.rect.center[1] = 0
     elevatorFloor = floor
-    if Elevator.rect.center[1]-15 > maxFloor*eachFloorSize-floor*eachFloorSize:
+    Elevator.textsurf = Elevator.font.render(str(elevatorFloor), 1, pygame.Color('red'))
+    Elevator.images[0].blit(Elevator.textsurf, [10, -3])
+    print("elevator at {} floor at  {}".format(Elevator.rect.center[1],(maxFloor-floor)*eachFloorSize))
+    if Elevator.rect.center[1]-15 > (maxFloor-floor)*eachFloorSize:
         Elevator.velocity.y = -elevatorVelocity
-        if Elevator.rect.center[1] <= maxFloor*eachFloorSize-floor*eachFloorSize:
+        if Elevator.rect.center[1] <= (maxFloor-floor)*eachFloorSize:
             Elevator.currentFloor = floor
-            Elevator.velocity.y = 0
-            print(Elevator.rect.center[1])
+            elevatorStop()
             return True
-    elif Elevator.rect.center[1]-15 < maxFloor*eachFloorSize-floor*eachFloorSize:
+    elif Elevator.rect.center[1]-15 < (maxFloor-floor)*eachFloorSize:
         Elevator.velocity.y = elevatorVelocity
-        if Elevator.rect.center[1] >= maxFloor*eachFloorSize-floor*eachFloorSize:
+        if Elevator.rect.center[1] >= (maxFloor-floor)*eachFloorSize:
             Elevator.currentFloor = floor
-            Elevator.velocity.y = 0
-            print(Elevator.rect.center[1])
+            elevatorStop()
             return True
     else:
         Elevator.velocity.y = 0
@@ -191,22 +176,32 @@ def floorToScreenHeight(floor):
 
 # -----end utility function -----
 
-
-
-
 def main():
     
 #    #for test
+#    create_person(10)
 #    create_person(9)
 #    create_person(8)
 #    create_person(7)
 #    create_person(6)
+#    create_person(5)
+#    create_person(4)
+#    create_person(3)
+#    create_person(2)
 #    create_person(1)
     count = 0
     
     running = True
     while running:
         
+        FloorText=pygame.font.SysFont("comicsansms",30)
+        for i in range(1,maxFloor+1):
+            text1=FloorText.render("{}F".format(i),True,(30,255,30))
+            pygame.draw.line(screen,pygame.Color('black'),(0,HEIGHT-28-eachFloorSize*i),(500,HEIGHT-28-eachFloorSize*i),3)
+            screen.blit(text1,(50,HEIGHT-15-eachFloorSize*i))
+        pygame.draw.line(screen,pygame.Color('black'),(465,0),(465,1000),3)
+        pygame.display.flip()
+
         dt = clock.tick(FPS) / 1000  # Amount of seconds between each loop.
         
         for event in pygame.event.get():
@@ -228,13 +223,14 @@ def main():
 #                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
 #                        Elevator.velocity.y = 0
         #calculate the person stop point
+        
         if count < len(playerX):
-            if playerX[count].rect.center[0] > stopPosition:
+            if playerX[count].rect.center[0] > stopPosition - NumberOfPersonOnFloor[playerX[count].floor]*20:
                 playerX[count].velocity.x = 0
                 playerX[count].state = STATE.WAITING
                 count += 1
 #        #for test
-#        elevatorMoveTo(10)
+
 #        if len(peopleInElevator) == 0:
 #            if person_entering(playerX[0]):
 #                peopleInElevator.append(playerX[0])
@@ -255,6 +251,7 @@ def main():
         all_sprites.draw(screen)
         elevator_sprites.draw(screen)
         pygame.display.update()
+
 
 
 
