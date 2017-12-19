@@ -3,6 +3,8 @@ import time
 from collections import defaultdict
 
 from GUI import elevatorMoveTo
+from GUI import ElevatorMove
+
 class Elevator(threading.Thread):
     def __init__(self):
         super().__init__(name="elevator")
@@ -20,9 +22,10 @@ class Elevator(threading.Thread):
         if self.fromFloor > self.toFloor:
             for i in range(self.fromFloor, self.toFloor, -1):
                 self.lock.release()
-                elevatorMoveTo(self.fromFloor+1)
-                self.lock.acquire()
                 
+#                elevatorMoveToFloor(self.fromFloor+1)
+                self.lock.acquire()
+                elevatorMoveTo(self.fromFloor+1)
 
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
@@ -43,6 +46,7 @@ class Elevator(threading.Thread):
                 self.lock.release()
                 
                 self.lock.acquire()
+                elevatorMoveTo(self.fromFloor+1)
                 
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:

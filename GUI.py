@@ -64,6 +64,25 @@ class AnimatedSprite(pygame.sprite.Sprite):
         """This is the method that's being called when 'all_sprites.update(dt)' is called."""
         self.update_time_dependent(dt)
 
+
+
+class ElevatorMove(object):  # represents the bird, not the game
+    def __init__(self):
+        """ The constructor of the class """
+        self.image = pygame.image.load("elevator.png")
+        # the bird's position
+        self.x = 500
+        self.y = 0
+    def ElevatorMoveToFloor(floor):
+        self.y = (720-15)-floor*70
+    
+
+    def draw(self, surface):
+        # blit yourself at your current position
+        surface.blit(self.image, (self.x, self.y))
+
+
+
 pygame.init()
 
 SIZE = WIDTH, HEIGHT = 720, 720
@@ -87,6 +106,8 @@ ElevatorImages.append(pygame.image.load("elevator.png"))
 Elevator = AnimatedSprite(position=(500, eachFloorSize*(maxFloor-1)), images=ElevatorImages, floor = 1)
 Elevator.font = pygame.font.SysFont("Arial", 12)
 
+
+elevator1 = ElevatorMove()
 
 
 def load_images():
@@ -113,27 +134,30 @@ def elevatorStop():
     Elevator.velocity.y = 0
     return 0
 def elevatorMoveTo(floor):
-    if Elevator.rect.center[1]-15 > 720 or Elevator.rect.center[1]-15 < 0:
-        Elevator.rect.center[1] = 0
-    elevatorFloor = floor
-    Elevator.textsurf = Elevator.font.render(str(elevatorFloor), 1, pygame.Color('red'))
-    Elevator.images[0].blit(Elevator.textsurf, [10, -3])
-    print("elevator at {} floor at  {}".format(Elevator.rect.center[1],(maxFloor-floor)*eachFloorSize))
-    if Elevator.rect.center[1]-15 > (maxFloor-floor)*eachFloorSize:
-        Elevator.velocity.y = -elevatorVelocity
-        if Elevator.rect.center[1] <= (maxFloor-floor)*eachFloorSize:
-            Elevator.currentFloor = floor
-            elevatorStop()
-            return True
-    elif Elevator.rect.center[1]-15 < (maxFloor-floor)*eachFloorSize:
-        Elevator.velocity.y = elevatorVelocity
-        if Elevator.rect.center[1] >= (maxFloor-floor)*eachFloorSize:
-            Elevator.currentFloor = floor
-            elevatorStop()
-            return True
-    else:
-        Elevator.velocity.y = 0
-    return False
+
+    elevator1.y = (720-30)-floor*70
+
+#    if Elevator.rect.center[1]-15 > 720 or Elevator.rect.center[1]-15 < 0:
+#        Elevator.rect.center[1] = 0
+#    elevatorFloor = floor
+#    Elevator.textsurf = Elevator.font.render(str(elevatorFloor), 1, pygame.Color('red'))
+#    Elevator.images[0].blit(Elevator.textsurf, [10, -3])
+#    print("elevator at {} floor at  {}".format(Elevator.rect.center[1],(maxFloor-floor)*eachFloorSize))
+#    if Elevator.rect.center[1]-15 > (maxFloor-floor)*eachFloorSize:
+#        Elevator.velocity.y = -elevatorVelocity
+#        if Elevator.rect.center[1] <= (maxFloor-floor)*eachFloorSize:
+#            Elevator.currentFloor = floor
+#            elevatorStop()
+#            return True
+#    elif Elevator.rect.center[1]-15 < (maxFloor-floor)*eachFloorSize:
+#        Elevator.velocity.y = elevatorVelocity
+#        if Elevator.rect.center[1] >= (maxFloor-floor)*eachFloorSize:
+#            Elevator.currentFloor = floor
+#            elevatorStop()
+#            return True
+#    else:
+#        Elevator.velocity.y = 0
+#    return False
 
 def create_person(floor):  # create a person ui
     
@@ -191,6 +215,8 @@ def main():
 #    create_person(1)
     count = 0
     
+    
+    
     running = True
     while running:
         
@@ -199,7 +225,11 @@ def main():
             text1=FloorText.render("{}F".format(i),True,(30,255,30))
             pygame.draw.line(screen,pygame.Color('black'),(0,HEIGHT-28-eachFloorSize*i),(500,HEIGHT-28-eachFloorSize*i),3)
             screen.blit(text1,(50,HEIGHT-15-eachFloorSize*i))
+        pygame.draw.line(screen,pygame.Color('black'),(0,697),(500,697),3)
         pygame.draw.line(screen,pygame.Color('black'),(465,0),(465,1000),3)
+        
+        elevator1.draw(screen)
+        
         pygame.display.flip()
 
         dt = clock.tick(FPS) / 1000  # Amount of seconds between each loop.
@@ -244,12 +274,12 @@ def main():
         #draw all sprites
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
         all_sprites.update(dt)  # Calls the 'update' method on all sprites in the list (currently just the player).
-        elevator_sprites = pygame.sprite.Group(Elevator)
-        elevator_sprites.update(dt)
-        
+#        elevator_sprites = pygame.sprite.Group(Elevator)
+#        elevator_sprites.update(dt)
+
         screen.fill(BACKGROUND_COLOR)
         all_sprites.draw(screen)
-        elevator_sprites.draw(screen)
+#        elevator_sprites.draw(screen)
         pygame.display.update()
 
 
