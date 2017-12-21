@@ -1,5 +1,7 @@
+CREATION = "creation"
+CALLING = "calling"
 WAITING = "waiting"
 ENTERING = "entering"
+ENTERED = "ENTERED"
 TRANSPORTING = "transporting"
 LEAVING = "leaving"
-CREATION = "creation"

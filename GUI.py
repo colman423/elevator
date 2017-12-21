@@ -73,7 +73,8 @@ class ElevatorMove(object):  # represents the bird, not the game
         # the bird's position
         self.x = 500
         self.y = 0
-    def ElevatorMoveToFloor(floor):
+
+    def ElevatorMoveToFloor(self, floor):
         self.y = (720-15)-floor*70
     
 
@@ -135,8 +136,10 @@ def elevatorStop():
     return 0
 def elevatorMoveTo(floor):
 
-    elevator1.y = (720-30)-floor*70
-
+    elevator1.y = (720-100)-floor*70
+    for person in playerX:
+        if person.rect.center[0] == elevatorPosition:
+            person.rect.center = [elevatorPosition, elevator1.y+20]
 #    if Elevator.rect.center[1]-15 > 720 or Elevator.rect.center[1]-15 < 0:
 #        Elevator.rect.center[1] = 0
 #    elevatorFloor = floor
@@ -159,35 +162,43 @@ def elevatorMoveTo(floor):
 #        Elevator.velocity.y = 0
 #    return False
 
-def create_person(floor):  # create a person ui
+def create_person(floor, no):  # create a person ui
     
     NumberOfPersonOnFloor[floor] += 1 #count the number of person in each floor
     images = load_images()  # Make sure to provide the relative or full path to the images directory.
-    player = AnimatedSprite(position=(100, HEIGHT-(10+floor*eachFloorSize)), images=images, floor = floor)
+    player = AnimatedSprite(position=(100, (720-30)-floor*70), images=images, floor = floor)
     
     #add font on person's head
-    player.font = pygame.font.SysFont("Arial", 12)
-    player.textsurf = player.font.render("test", 1, pygame.Color('red'))
+    player.font = pygame.font.SysFont("Arial", 24)
+    player.textsurf = player.font.render(str(no), 1, pygame.Color('black'))
     player.images[0].blit(player.textsurf, [10, -3])
     player.images[1].blit(player.textsurf, [10, -3])
     playerX.append(player)
-    player.velocity.x = 1
+    player.velocity.x = 3
+    player.state = STATE.CREATION
     return player
 
 
 def person_entering(person):  # let waiting person walk into elevator
-    person.velocity.x = 1
-    if person.rect.center[0] > elevatorPosition:
-        person.velocity.x = 0
-        person.InTheElevator = True
-        person.state = STATE.TRANSPORTING
-        NumberOfPersonOnFloor[person.floor] -= 1
-        return True
-    return False
+    # person.velocity.x = 1
+    # if person.rect.center[0] > elevatorPosition:
+    #     person.velocity.x = 0
+    #     person.InTheElevator = True
+    #     # person.state = STATE.ENTERED
+    #     NumberOfPersonOnFloor[person.floor] -= 1
+    #     return True
+    # return False
+    person.rect.center = [elevatorPosition, person.rect.center[1]]
+    # person.velocity.x = 0
+    person.InTheElevator = True
+    # person.state = STATE.ENTERED
+    NumberOfPersonOnFloor[person.floor] -= 1
+    return True
+
 
 def person_leaving(person):  # let arrived person leave the window
     person.state = STATE.LEAVING
-    person.velocity.x = -1
+    person.velocity.x = 1
     person.velocity.y = 0
     person.InTheElevator = False
     return True
@@ -201,6 +212,7 @@ def floorToScreenHeight(floor):
 # -----end utility function -----
 
 def main():
+    elevatorMoveTo(0)
     
 #    #for test
 #    create_person(10)
@@ -257,7 +269,8 @@ def main():
         if count < len(playerX):
             if playerX[count].rect.center[0] > stopPosition - NumberOfPersonOnFloor[playerX[count].floor]*20:
                 playerX[count].velocity.x = 0
-                playerX[count].state = STATE.WAITING
+                playerX[count].state = STATE.CALLING
+                print ("GUI CALLING")
                 count += 1
 #        #for test
 

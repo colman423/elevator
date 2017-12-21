@@ -1,6 +1,7 @@
 import threading
 import time
 from collections import defaultdict
+from CONST import *
 
 from GUI import elevatorMoveTo
 from GUI import ElevatorMove
@@ -14,6 +15,7 @@ class Elevator(threading.Thread):
         self.passenger_num = 0
         self.active = False
         self.fromFloor = 0
+        self.nowFloor = 0
         self.toFloor = 0
         self.lock = threading.Lock()
         self.lock.acquire()
@@ -21,11 +23,11 @@ class Elevator(threading.Thread):
     def transport_passenger_when_moving(self):
         if self.fromFloor > self.toFloor:
             for i in range(self.fromFloor, self.toFloor, -1):
-                self.lock.release()
-                
+                # self.lock.release()
+                self.nowFloor = i
 #                elevatorMoveToFloor(self.fromFloor+1)
-                self.lock.acquire()
-                elevatorMoveTo(self.fromFloor+1)
+#                 self.lock.acquire()
+                elevatorMoveTo(i)
 
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
@@ -41,12 +43,14 @@ class Elevator(threading.Thread):
                     self.toTransport = [desitnation for desitnation in self.toTransport if desitnation != i]
                     print("{} people exits".format(leave_num))
                     print('In elevator(to transport): ', self.toTransport)
+                time.sleep(ELEVATOR_TIME)
         elif self.fromFloor < self.toFloor:
             for i in range(self.fromFloor, self.toFloor):
-                self.lock.release()
-                
-                self.lock.acquire()
-                elevatorMoveTo(self.fromFloor+1)
+                # self.lock.release()
+
+                self.nowFloor = i
+                # self.lock.acquire()
+                elevatorMoveTo(i)
                 
                 print('Elevator arrive at {}'.format(i))
                 if self.waiting_list[i] != []:
@@ -63,14 +67,18 @@ class Elevator(threading.Thread):
                     print("{} people exits".format(leave_num))
                     print('In elevator(to transport): ', self.toTransport)
 
+                time.sleep(ELEVATOR_TIME)
+
     def take_passenger(self, atFloor):
         self.toFloor = atFloor
-        time.sleep(0.1) # moving time
+        time.sleep(ELEVATOR_TIME) # moving time
         print("Elevator move from {} to {}...".format(self.fromFloor, self.toFloor))
 
         self.transport_passenger_when_moving()
-        self.lock.release()
-        self.lock.acquire()     
+        # self.lock.release()
+        # self.lock.acquire()
+        self.nowFloor = self.toFloor
+        elevatorMoveTo(self.toFloor)
         print('Elevator arrive at {}'.format(self.toFloor))
         self.passenger_num += len(self.waiting_list[atFloor])
         self.waiting_num -= len(self.waiting_list[atFloor])
@@ -87,13 +95,15 @@ class Elevator(threading.Thread):
         self.toFloor = floor 
         # need to implement a exiting prioirtiy to choose which floor the elevator should go to
         # now we take the floor the most people are going to
-        time.sleep(0.1)
+        time.sleep(ELEVATOR_TIME)
         
         print("Elevator move from {} to {}...".format(self.fromFloor, self.toFloor))
         
         self.transport_passenger_when_moving()
         self.lock.release()
-        self.lock.acquire()            
+        self.lock.acquire()
+        self.nowFloor = self.toFloor
+        elevatorMoveTo(self.toFloor)
         print('Elevator arrive at {}'.format(self.toFloor))
         leave_num = len([desitnation for desitnation in self.toTransport if desitnation == self.toFloor])
         self.passenger_num -= leave_num # reduce the same desitnation people num
