@@ -130,5 +130,5 @@ class RandomAccessFloor(threading.Thread):
                 if not l.locked():
                     l.acquire()
             floor_lock[f].release()
-            time.sleep(0.01) # wait for person entering
+            time.sleep(DOOR_OPEN_TIME) # wait for person entering
             floor_lock[f].acquire()
