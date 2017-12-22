@@ -150,6 +150,7 @@ def create_person(floor, no):  # create a person ui
     
     #add font on person's head
     player.font = pygame.font.SysFont("Arial", 24)
+    player.name = str(no)
     player.textsurf = player.font.render(str(no), 1, pygame.Color('black'))
     player.images[0].blit(player.textsurf, [5, -3])
     player.images[1].blit(player.textsurf, [5, -3])
@@ -171,8 +172,11 @@ def person_entering(person):  # let waiting person walk into elevator
 
 def person_leaving(person):  # let arrived person leave the window
     person.state = STATE.LEAVING
-    person.velocity.x = 1
+    person.velocity.x = 5
     person.velocity.y = 0
+    person.textsurf = person.font.render(person.name, 1, pygame.Color('black'))
+    person.images[0].blit(person.textsurf, [5, -3])
+    person.images[1].blit(person.textsurf, [5, -3])
     person.InTheElevator = False
     return True
 
@@ -224,6 +228,9 @@ def main():
         if count < len(playerX):
             if playerX[count].rect.center[0] > stopPosition - NumberOfPersonOnFloor[playerX[count].floor]*20:
                 playerX[count].velocity.x = 0
+                playerX[count].textsurf = playerX[count].font.render(playerX[count].name, 1, pygame.Color('red'))
+                playerX[count].images[0].blit(playerX[count].textsurf, [5, -3])
+                playerX[count].images[1].blit(playerX[count].textsurf, [5, -3])
                 playerX[count].state = STATE.CALLING
                 print ("GUI CALLING")
                 count += 1
