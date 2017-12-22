@@ -91,8 +91,11 @@ class Elevator(threading.Thread):
         
     def transport(self):
         self.fromFloor = self.toFloor
-        floor = sorted(self.toTransport, key= lambda t: self.toTransport.count(t)).pop()
-        self.toFloor = floor 
+        if self.waiting_num < 10:
+            floor = sorted(self.toTransport, key= lambda t: self.toTransport.count(t)).pop()
+            self.toFloor = floor  # prefer to transport passenger
+        else:
+            self.toFloor = 9 if self.toFloor < 5 else 0  # prefer to take passenger
         # need to implement a exiting prioirtiy to choose which floor the elevator should go to
         # now we take the floor the most people are going to
         time.sleep(ELEVATOR_TIME)
@@ -134,7 +137,10 @@ class Elevator(threading.Thread):
         if self.active == False:
             print("ACTIVE")
             self.active = True
-            floor = sorted(self.waiting_list.items(), key= lambda t: len(t[1])).pop()[0]
+            if self.waiting_num < 10:
+                floor = sorted(self.waiting_list.items(), key= lambda t: len(t[1])).pop()[0] # prefer to transport passenger
+            else:
+                floor = 9 if self.nowFloor < 5 else 0 # prefer to take passenger
             # need to implement a waiting prioirtiy to choose which floor the elevator should go to
             # now we take the floor the most people waiting
             self.take_passenger(floor)
