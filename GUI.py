@@ -17,6 +17,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
         
         
         self.state = STATE.CREATION
+        self.dead = False
         self.floor = floor
         self.isMoving = True
         self.currentFloor = 0
@@ -178,6 +179,7 @@ def person_leaving(person):  # let arrived person leave the window
     person.images[0].blit(person.textsurf, [5, -3])
     person.images[1].blit(person.textsurf, [5, -3])
     person.InTheElevator = False
+    person.dead = True
     return True
 
 # -----end thread function-----
@@ -235,6 +237,9 @@ def main():
                 print ("GUI CALLING")
                 count += 1
 
+        for person in playerX:
+            if person.dead and person.rect.center[0] >= 1000:
+                person.velocity.x = 0
 
         #draw all sprites
         all_sprites = pygame.sprite.Group(playerX) # Creates a sprite group and adds 'player' to it.
