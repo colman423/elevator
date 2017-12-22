@@ -2,4 +2,4 @@ MAX_FLOOR = 10
 FLOOR = 10
 ELEVATOR_TIME = 0.2
 DOOR_OPEN_TIME = 0.01
-LAMBDA = 1.5
+LAMBDA = float(input("LAMBDA(default 1.5): ") or 1.5)
